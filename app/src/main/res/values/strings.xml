@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">CatGPT</string>
+    <string name="cat_is_typing">Cat is typing...</string>
+    <string name="send">Send</string>
+    <string name="write_message">Write message</string>
+    <string name="open_actions">Open actions</string>
+    <string name="delete">Delete</string>
+    <string name="are_you_sure_you_want_to_delete_that_message">Are you sure you want to delete that message?</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+</resources>
