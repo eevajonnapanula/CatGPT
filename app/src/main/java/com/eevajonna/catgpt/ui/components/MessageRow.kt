@@ -1,5 +1,6 @@
 package com.eevajonna.catgpt.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,6 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -22,6 +26,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.eevajonna.catgpt.R
 import com.eevajonna.catgpt.data.Message
 import com.eevajonna.catgpt.data.Sender
+import com.eevajonna.catgpt.ui.screens.ChatScreen
 
 @Composable
 fun MessageRow(message: Message, deleteMessage: (Message) -> Unit) {
@@ -43,7 +48,7 @@ fun MessageRow(message: Message, deleteMessage: (Message) -> Unit) {
     }
 
     ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-        val (text) = createRefs()
+        val (text, reaction) = createRefs()
         Row(
             Modifier
                 .padding(vertical = MessageRow.verticalPadding)
@@ -76,6 +81,20 @@ fun MessageRow(message: Message, deleteMessage: (Message) -> Unit) {
                     ),
             )
         }
+
+        message.reaction?.let {
+            Text(
+                modifier = Modifier
+                    .clip(ChatScreen.shape)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(MessageRow.reactionPadding)
+                    .constrainAs(reaction) {
+                        end.linkTo(text.end, MessageRow.reactionPadding)
+                        bottom.linkTo(text.bottom)
+                    },
+                text = it.emoji,
+            )
+        }
     }
 }
 
@@ -88,4 +107,5 @@ fun DeleteIcon(modifier: Modifier = Modifier, deleteMessage: () -> Unit) {
 
 object MessageRow {
     val verticalPadding = 16.dp
+    val reactionPadding = 4.dp
 }
