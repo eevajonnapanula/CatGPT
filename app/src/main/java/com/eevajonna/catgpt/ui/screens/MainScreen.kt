@@ -19,5 +19,9 @@ fun MainScreen(viewModel: CatGPTViewModel) {
         viewModel.deleteMessage(message)
     }
 
-    ChatScreen(viewModel.messages, viewModel.catTyping, ::sendMessage, ::deleteMessage)
+    fun updateMessage(message: Message) {
+        viewModel.updateMessage(message)
+    }
+
+    ChatScreen(viewModel.messages, viewModel.catTyping, ::sendMessage, ::deleteMessage, ::updateMessage)
 }

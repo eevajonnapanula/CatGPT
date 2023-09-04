@@ -40,6 +40,7 @@ import com.eevajonna.catgpt.R
 import com.eevajonna.catgpt.data.Message
 import com.eevajonna.catgpt.data.Sender
 import com.eevajonna.catgpt.ui.components.MessageRow
+import com.eevajonna.catgpt.ui.components.ReactionPicker
 import com.eevajonna.catgpt.ui.theme.CatGPTTheme
 import kotlinx.coroutines.launch
 
@@ -50,10 +51,15 @@ fun ChatScreen(
     catTyping: Boolean,
     sendMessage: (String) -> Unit,
     deleteMessage: (Message) -> Unit,
+    updateMessage: (Message) -> Unit,
 ) {
     var newMessage by remember { mutableStateOf("") }
     var listState = rememberLazyListState()
     var coroutineScope = rememberCoroutineScope()
+
+    var currentMessage by remember { mutableStateOf(Message()) }
+    var currentMessageYPosition by remember { mutableStateOf(0.dp) }
+    var showReactionPicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(listState.layoutInfo.totalItemsCount) {
         coroutineScope.launch {
@@ -80,7 +86,11 @@ fun ChatScreen(
                 modifier = Modifier.weight(ChatScreen.chatAreaWeight),
             ) {
                 items(messages) { message ->
-                    MessageRow(message = message, deleteMessage = deleteMessage)
+                    MessageRow(message = message, deleteMessage = deleteMessage, openReactionPicker = { position ->
+                        currentMessageYPosition = position
+                        currentMessage = message
+                        showReactionPicker = true
+                    })
                 }
                 item {
                     if (catTyping) {
@@ -98,6 +108,18 @@ fun ChatScreen(
                 },
             )
         }
+    }
+    if (showReactionPicker) {
+        ReactionPicker(
+            message = currentMessage,
+            yPosition = currentMessageYPosition,
+            onReactionSelect = updateMessage,
+            onDismiss = {
+                showReactionPicker = false
+                currentMessage = Message()
+                currentMessageYPosition = 0.dp
+            },
+        )
     }
 }
 
@@ -158,7 +180,7 @@ fun ChatScreenPreview() {
     )
 
     CatGPTTheme {
-        ChatScreen(messages = messages, false, {}, {})
+        ChatScreen(messages = messages, false, {}, {}, {})
     }
 }
 

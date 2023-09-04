@@ -19,8 +19,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.eevajonna.catgpt.R
@@ -29,9 +33,12 @@ import com.eevajonna.catgpt.data.Sender
 import com.eevajonna.catgpt.ui.screens.ChatScreen
 
 @Composable
-fun MessageRow(message: Message, deleteMessage: (Message) -> Unit) {
+fun MessageRow(message: Message, deleteMessage: (Message) -> Unit, openReactionPicker: (Dp) -> Unit) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     val isMe = message.sender == Sender.ME
+
+    val density = LocalDensity.current
+    var yPosition by remember { mutableStateOf(0.dp) }
 
     var deleteIsVisible by remember { mutableStateOf(false) }
 
@@ -47,7 +54,13 @@ fun MessageRow(message: Message, deleteMessage: (Message) -> Unit) {
         }
     }
 
-    ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxWidth()
+            .onGloballyPositioned {
+                yPosition = with(density) { it.positionInParent().y.toDp() + (MessageRow.reactionDialogOffset + MessageRow.reactionPadding) }
+            },
+    ) {
         val (text, reaction) = createRefs()
         Row(
             Modifier
@@ -76,7 +89,12 @@ fun MessageRow(message: Message, deleteMessage: (Message) -> Unit) {
                                 deleteIsVisible = !deleteIsVisible
                             }
                         } else {
-                            Modifier
+                            Modifier.clickable(
+                                role = Role.Button,
+                                onClickLabel = stringResource(R.string.add_reaction),
+                            ) {
+                                openReactionPicker(yPosition)
+                            }
                         },
                     ),
             )
@@ -108,4 +126,5 @@ fun DeleteIcon(modifier: Modifier = Modifier, deleteMessage: () -> Unit) {
 object MessageRow {
     val verticalPadding = 16.dp
     val reactionPadding = 4.dp
+    val reactionDialogOffset = 28.dp
 }

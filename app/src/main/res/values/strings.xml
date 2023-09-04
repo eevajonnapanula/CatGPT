@@ -8,4 +8,5 @@
     <string name="are_you_sure_you_want_to_delete_that_message">Are you sure you want to delete that message?</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
+    <string name="add_reaction">Add reaction</string>
 </resources>
